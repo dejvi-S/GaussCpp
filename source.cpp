@@ -11,6 +11,7 @@ public:
     unsigned int matrixSize;
     Gauss();
     Gauss(string fileName);
+    Gauss(const Gauss &objectToClone);
     bool fileRead(string fileName);
     bool printMatrix();
 
@@ -19,9 +20,12 @@ public:
 int main()
 {
     Gauss g1 = Gauss();
+    g1.printMatrix();
     Gauss g2 = Gauss("test.csv");
-    //g1.printMatrix();
     g2.printMatrix();
+    cout << "\n";
+    Gauss g3 = Gauss(g2);
+    g3.printMatrix();
     return 0;
 }
 Gauss::Gauss(string fileName) {
@@ -80,4 +84,8 @@ bool Gauss::printMatrix() {
         }
         cout << "\n";
     }
+}
+Gauss::Gauss(const Gauss &objectToClone) {
+    this->matrixSize = objectToClone.matrixSize;
+    this->matrixVectors = objectToClone.matrixVectors;
 }
