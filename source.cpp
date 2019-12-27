@@ -12,6 +12,7 @@ public:
     Gauss();
     Gauss(string fileName);
     bool fileRead(string fileName);
+    bool printMatrix();
 
 };
 
@@ -19,12 +20,14 @@ int main()
 {
     Gauss g1 = Gauss();
     Gauss g2 = Gauss("test.csv");
+    //g1.printMatrix();
+    g2.printMatrix();
     return 0;
 }
 Gauss::Gauss(string fileName) {
     if(!fileRead(fileName)) {
         cout << "Uruchamiam konstruktor domyslny!\n";
-        Gauss();
+        *this = Gauss();
     }
 }
 Gauss::Gauss() {
@@ -65,4 +68,16 @@ bool Gauss::fileRead(string fileName) {
     }
     sourceFile.close();
     return true;
+}
+bool Gauss::printMatrix() {
+    if( this->matrixVectors.empty() ) {
+        cout << "Macierz jest pusta! Nie mam co wypisac!\n";
+        return false;
+    }
+    for(int i=0; i<matrixSize; i++) {
+        for(int j=0; j<=matrixSize; j++) {
+            cout << matrixVectors[i][j] << "\t";
+        }
+        cout << "\n";
+    }
 }
