@@ -19,6 +19,8 @@ public:
     bool printMatrix();
     bool diagonalCheckZero(unsigned int index);
     double matrixFactor(unsigned int index, unsigned int offsetIndex);
+    bool rowCalculation(unsigned int index);
+
 };
 
 int main()
@@ -98,4 +100,13 @@ bool Gauss::diagonalCheckZero(unsigned int index) {
 }
 double Gauss::matrixFactor(unsigned int index, unsigned int offsetIndex) {
     return matrixVectors[index+1+offsetIndex][index]/matrixVectors[index][index];
+}
+bool Gauss::rowCalculation(unsigned int index) {
+    for( int i=index; i<matrixSize-1 ;i++ ) {
+            double tempFactor = matrixFactor(index,i-index);
+            for(int j=index+1; j<=matrixSize; j++)
+                matrixVectors[i+1][j] = matrixVectors[i+1][j] - tempFactor * matrixVectors[index][j];
+            for( int j=0; j<=index; j++)
+                matrixVectors[i+1][j] = 0;
+    }
 }
