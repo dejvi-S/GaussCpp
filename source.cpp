@@ -1,12 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 using namespace std;
+
+const double ESPe = 1e-20;
 
 class Gauss {
 protected:
     vector<vector<double>> matrixVectors;
-
+    vector<unsigned int> swapStack;
 public:
     unsigned int matrixSize;
     Gauss();
@@ -14,7 +17,8 @@ public:
     Gauss(const Gauss &objectToClone);
     bool fileRead(string fileName);
     bool printMatrix();
-
+    bool diagonalCheckZero(unsigned int index);
+    double matrixFactor(unsigned int index, unsigned int offsetIndex);
 };
 
 int main()
@@ -88,4 +92,10 @@ bool Gauss::printMatrix() {
 Gauss::Gauss(const Gauss &objectToClone) {
     this->matrixSize = objectToClone.matrixSize;
     this->matrixVectors = objectToClone.matrixVectors;
+}
+bool Gauss::diagonalCheckZero(unsigned int index) {
+    return (fabs(matrixVectors[index][index]) < ESPe) ? true : false;
+}
+double Gauss::matrixFactor(unsigned int index, unsigned int offsetIndex) {
+    return matrixVectors[index+1+offsetIndex][index]/matrixVectors[index][index];
 }
