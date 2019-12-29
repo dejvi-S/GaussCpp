@@ -4,12 +4,13 @@
 #include <algorithm>
 using namespace std;
 
-const double ESPe = 1e-20;
+const double ESPe = 1e-15;
 
 class Gauss {
 protected:
     vector<vector<double>> matrixVectors;
     vector<unsigned int> swapStack;
+    vector<double> result;
 public:
     unsigned int matrixSize;
     Gauss();
@@ -19,19 +20,19 @@ public:
     bool printMatrix();
     bool diagonalCheckZero(unsigned int index);
     double matrixFactor(unsigned int index, unsigned int offsetIndex);
-    bool rowCalculation(unsigned int index);
-
+    void rowCalculation(unsigned int index);
+    bool gaussMainCalculations(unsigned int &index);
+    void basicGauss();
+    void printResult(bool successSwitch);
+    bool maxElementInRow(unsigned int index);
 };
 
 int main()
 {
-    Gauss g1 = Gauss();
+    Gauss g1 = Gauss("test.csv");
     g1.printMatrix();
-    Gauss g2 = Gauss("test.csv");
-    g2.printMatrix();
-    cout << "\n";
-    Gauss g3 = Gauss(g2);
-    g3.printMatrix();
+    g1.basicGauss();
+
     return 0;
 }
 Gauss::Gauss(string fileName) {
@@ -46,7 +47,8 @@ Gauss::Gauss() {
         vector<double> temp;
         for( int j=0; j <= matrixSize; j++)
                 temp.push_back(j);
-        this->matrixVectors.push_back(temp);
+        matrixVectors.push_back(temp);
+        result.assign(matrixSize,0);
     }
 }
 bool Gauss::fileRead(string fileName) {
@@ -77,6 +79,7 @@ bool Gauss::fileRead(string fileName) {
         delete tempDouble;
     }
     sourceFile.close();
+    result.assign(matrixSize,0);
     return true;
 }
 bool Gauss::printMatrix() {
@@ -101,7 +104,7 @@ bool Gauss::diagonalCheckZero(unsigned int index) {
 double Gauss::matrixFactor(unsigned int index, unsigned int offsetIndex) {
     return matrixVectors[index+1+offsetIndex][index]/matrixVectors[index][index];
 }
-bool Gauss::rowCalculation(unsigned int index) {
+void Gauss::rowCalculation(unsigned int index) {
     for( int i=index; i<matrixSize-1 ;i++ ) {
             double tempFactor = matrixFactor(index,i-index);
             for(int j=index+1; j<=matrixSize; j++)
@@ -110,3 +113,65 @@ bool Gauss::rowCalculation(unsigned int index) {
                 matrixVectors[i+1][j] = 0;
     }
 }
+bool Gauss::gaussMainCalculations(unsigned int &index)
+{
+    for(int i=index; i<matrixSize-1; i++)
+    {
+        if(!diagonalCheckZero(i)) {
+            rowCalculation(i);
+            for(int i=matrixSize-1; i>=0; i--)
+            {
+                double sum = 0;
+                for(int j=matrixSize-1; j>i; j--)
+                    sum = sum+result[j] * matrixVectors[i][j];
+                result[i] = (-sum + matrixVectors[i][matrixSize]) / matrixVectors[i][i];
+            }
+        }
+        else {
+            index = i;
+            return false;
+        }
+    }
+    return true;
+}
+void Gauss::basicGauss() {
+    unsigned int lastIndex = 0;
+    (gaussMainCalculations(lastIndex)) ? printResult(true) : printResult(false);
+}
+void Gauss::printResult(bool successSwitch){
+    if(successSwitch) {
+        if(result.empty()) {
+            cout<<"Zbior wynikow jest pusty!\n";
+        } else {
+            while(!swapStack.empty()) {
+                swap(result[swapStack.back()],result[swapStack.back()-1]);
+                swapStack.pop_back(); swapStack.pop_back();
+            }
+            cout<<"\nWynik:\n";
+            for(int i=0; i<result.size(); i++) {
+                cout<<"X"<<i<<":    "<<result[i]<<"\n";
+            }
+        }
+    } else cout<<"Macierz nieosobliwa!\n";
+}
+bool Gauss::maxElementInRow(unsigned int index)
+    {
+        double tempMaxElement = fabs(matrixVectors[index][index]);
+        unsigned int swapIndex = index;
+        for(int i=index+1;i<matrixSize;i++)
+            if(tempMaxElement<fabs(matrixVectors[i][index]))
+            {
+                tempMaxElement = fabs(matrixVectors[i][index]);
+                swapIndex = i;
+            }
+        if(index == swapIndex) {
+            return false;
+        }
+        else {
+            swapStack.push_back(index);
+            swapStack.push_back(swapIndex);
+            for(int i=0; i<matrixSize; i++)
+                swap(matrixVectors[i][swapIndex],matrixVectors[i][index]);
+            return true;
+        }
+    }
