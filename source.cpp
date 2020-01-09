@@ -21,8 +21,7 @@ public:
     bool diagonalCheckZero(unsigned int index);
     double matrixFactor(unsigned int index, unsigned int offsetIndex);
     void rowCalculation(unsigned int index);
-    bool gaussMainCalculations(unsigned int index);
-    void basicGauss();
+    bool basicGauss();
     void printResult(bool successSwitch);
     bool maxElementInRow(unsigned int index);
     bool maxElementInColumn(unsigned int index);
@@ -37,10 +36,14 @@ int main()
     Gauss g1 = Gauss("test.csv");
     Gauss g2 = Gauss(g1),g3 = Gauss(g1),g4 = Gauss(g1);
     g1.printMatrix();
-    g1.basicGauss();
-    g2.gaussInRow();
-    g3.gaussInColumn();
-    g4.gaussFull();
+    g1.printResult(g1.basicGauss());
+    g1.printMatrix();
+    g2.printResult(g2.gaussInRow());
+    g2.printMatrix();
+    g3.printResult(g3.gaussInColumn());
+    g3.printMatrix();
+    g4.printResult(g4.gaussFull());
+    g4.printMatrix();
 
 
     return 0;
@@ -107,6 +110,7 @@ bool Gauss::printMatrix() {
 Gauss::Gauss(const Gauss &objectToClone) {
     this->matrixSize = objectToClone.matrixSize;
     this->matrixVectors = objectToClone.matrixVectors;
+    this->result = objectToClone.result;
 }
 bool Gauss::diagonalCheckZero(unsigned int index) {
     return (fabs(matrixVectors[index][index]) < ESPe) ? true : false;
@@ -123,37 +127,27 @@ void Gauss::rowCalculation(unsigned int index) {
                 matrixVectors[i+1][j] = 0;
     }
 }
-bool Gauss::gaussMainCalculations(unsigned int index)
-{
-    if(!diagonalCheckZero(index)) {
-        rowCalculation(index);
-       //kalkulation
-        return true;
+bool Gauss::basicGauss() {
+    for(int i=0; i<matrixSize-1; i++)
+    {
+        if(!diagonalCheckZero(i)) {
+            rowCalculation(i);
+        }
+        else
+            return false;
     }
-    else
-        return false;
+    return true;
 }
-void Gauss::basicGauss() {
-    bool breaked = false;
-    for(int i=0; i<matrixSize-1; i++) {
-        if(!gaussMainCalculations(i))
-            break;
-    }
-    if(breaked)
-        printResult(false);
-    else {
+void Gauss::printResult(bool successSwitch){
+        if(successSwitch) {
         for(int i=matrixSize-1; i>=0; i--)
         {
             double sum = 0;
             for(int j=matrixSize-1; j>i; j--)
                 sum = sum+result[j] * matrixVectors[i][j];
             result[i] = (-sum + matrixVectors[i][matrixSize]) / matrixVectors[i][i];
+
         }
-        printResult(true);
-    }
-}
-void Gauss::printResult(bool successSwitch){
-    if(successSwitch) {
         if(result.empty()) {
             cout<<"Zbior wynikow jest pusty!\n";
         } else {
@@ -232,30 +226,42 @@ void Gauss::maxElementInMatrix(unsigned int index)
 }
 bool Gauss::gaussInColumn()
 {
-    for(int i=0; i<matrixSize-1; i++) {
-        maxElementInColumn(i);
-        gaussMainCalculations(i);
+    for(int i=0; i<matrixSize-1; i++)
+    {
+        if(i<matrixSize-2)
+            maxElementInColumn(i);
+        if(!diagonalCheckZero(i)) {
+            rowCalculation(i);
+        }
+        else
+            return false;
     }
+    return true;
 }
 bool Gauss::gaussInRow()
 {
-    for(int i=0; i<matrixSize-1; i++) {
-        maxElementInRow(i);
-        gaussMainCalculations(i);
-    }
-    for(int i=matrixSize-1; i>=0; i--)
+    for(int i=0; i<matrixSize-1; i++)
     {
-        double sum = 0;
-        for(int j=matrixSize-1; j>i; j--)
-            sum = sum+result[j] * matrixVectors[i][j];
-        result[i] = (-sum + matrixVectors[i][matrixSize]) / matrixVectors[i][i];
+        maxElementInRow(i);
+        if(!diagonalCheckZero(i)) {
+            rowCalculation(i);
+        }
+        else
+            return false;
     }
-    printResult(true);
+    return true;
 }
 bool Gauss::gaussFull()
 {
-    for(int i=0; i<matrixSize-1; i++) {
-        maxElementInMatrix(i);
-        gaussMainCalculations(i);
+    for(int i=0; i<matrixSize-1; i++)
+    {
+        if(i<matrixSize-2)
+            maxElementInMatrix(i);
+        if(!diagonalCheckZero(i)) {
+            rowCalculation(i);
+        }
+        else
+            return false;
     }
+    return true;
 }
