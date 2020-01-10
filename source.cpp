@@ -4,7 +4,7 @@
 #include <algorithm>
 using namespace std;
 
-const double ESPe = 1e-15;
+const double ESPe = 1e-12;
 
 class Gauss {
 protected:
@@ -12,6 +12,7 @@ protected:
     vector<unsigned int> swapStack;
     vector<double> result;
 public:
+    enum N {ROW, COL, FULL, BASIC};
     unsigned int matrixSize;
     Gauss();
     Gauss(string fileName);
@@ -21,28 +22,25 @@ public:
     bool diagonalCheckZero(unsigned int index);
     double matrixFactor(unsigned int index, unsigned int offsetIndex);
     void rowCalculation(unsigned int index);
-    bool basicGauss();
+    bool gauss(N e);
     void printResult(bool successSwitch);
-    bool maxElementInRow(unsigned int index);
-    bool maxElementInColumn(unsigned int index);
+    void maxElementInRow(unsigned int index);
+    void maxElementInColumn(unsigned int index);
     void maxElementInMatrix(unsigned int index);
-    bool gaussInColumn();
-    bool gaussInRow();
-    bool gaussFull();
 };
 
 int main()
 {
-    Gauss g1 = Gauss("test.csv");
+    Gauss g1 = Gauss("test5.csv");
     Gauss g2 = Gauss(g1),g3 = Gauss(g1),g4 = Gauss(g1);
     g1.printMatrix();
-    g1.printResult(g1.basicGauss());
+    g1.printResult(g1.gauss(Gauss::BASIC));
     g1.printMatrix();
-    g2.printResult(g2.gaussInRow());
+    g2.printResult(g2.gauss(Gauss::ROW));
     g2.printMatrix();
-    g3.printResult(g3.gaussInColumn());
+    g3.printResult(g3.gauss(Gauss::COL));
     g3.printMatrix();
-    g4.printResult(g4.gaussFull());
+    g4.printResult(g4.gauss(Gauss::FULL));
     g4.printMatrix();
 
 
@@ -127,17 +125,6 @@ void Gauss::rowCalculation(unsigned int index) {
                 matrixVectors[i+1][j] = 0;
     }
 }
-bool Gauss::basicGauss() {
-    for(int i=0; i<matrixSize-1; i++)
-    {
-        if(!diagonalCheckZero(i)) {
-            rowCalculation(i);
-        }
-        else
-            return false;
-    }
-    return true;
-}
 void Gauss::printResult(bool successSwitch){
         if(successSwitch) {
         for(int i=matrixSize-1; i>=0; i--)
@@ -162,7 +149,7 @@ void Gauss::printResult(bool successSwitch){
         }
     } else cout<<"Macierz nieosobliwa!\n";
 }
-bool Gauss::maxElementInRow(unsigned int index)
+void Gauss::maxElementInRow(unsigned int index)
 {
     double tempMaxElement = fabs(matrixVectors[index][index]);
     unsigned int swapIndex = index;
@@ -171,18 +158,14 @@ bool Gauss::maxElementInRow(unsigned int index)
             tempMaxElement = fabs(matrixVectors[index][i]);
             swapIndex = i;
         }
-    if(index == swapIndex) {
-        return false;
-    }
-    else {
+    if(index != swapIndex) {
         swapStack.push_back(index);
         swapStack.push_back(swapIndex);
         for(int i=index; i<matrixSize; i++)
             swap(matrixVectors[i][swapIndex],matrixVectors[i][index]);
-        return true;
     }
 }
-bool Gauss::maxElementInColumn(unsigned int index)
+void Gauss::maxElementInColumn(unsigned int index)
 {
     double tempMaxElement = fabs(matrixVectors[index][index]);
     unsigned int swapIndex = index;
@@ -192,12 +175,9 @@ bool Gauss::maxElementInColumn(unsigned int index)
             tempMaxElement = fabs(matrixVectors[i][index]);
             swapIndex = i;
         }
-    if(index == swapIndex)
-        return false;
-    else {
+    if(index != swapIndex) {
         for(int i=index; i<=matrixSize; i++)
             swap(matrixVectors[swapIndex][i],matrixVectors[index][i]);
-        return true;
     }
 }
 void Gauss::maxElementInMatrix(unsigned int index)
@@ -224,12 +204,35 @@ void Gauss::maxElementInMatrix(unsigned int index)
             swap(matrixVectors[i][swapIndexJ],matrixVectors[i][index]);
     }
 }
-bool Gauss::gaussInColumn()
-{
+bool Gauss::gauss(N e) {
+    typedef void( Gauss::*functor)(unsigned int);
+    functor sortFunction;
+    switch(e)
+    {
+        case ROW:
+            sortFunction = &Gauss::maxElementInRow;
+            break;
+        case COL:
+            sortFunction = &Gauss::maxElementInColumn;
+            break;
+        case FULL:
+            sortFunction = &Gauss::maxElementInMatrix;
+            break;
+        default:
+            for(int i=0; i<matrixSize-1; i++)
+            {
+                if(!diagonalCheckZero(i)) {
+                    rowCalculation(i);
+                }
+                else
+                    return false;
+            }
+            return true;
+            break;
+    }
     for(int i=0; i<matrixSize-1; i++)
     {
-        if(i<matrixSize-2)
-            maxElementInColumn(i);
+        (this->*sortFunction)(i);
         if(!diagonalCheckZero(i)) {
             rowCalculation(i);
         }
@@ -238,30 +241,5 @@ bool Gauss::gaussInColumn()
     }
     return true;
 }
-bool Gauss::gaussInRow()
-{
-    for(int i=0; i<matrixSize-1; i++)
-    {
-        maxElementInRow(i);
-        if(!diagonalCheckZero(i)) {
-            rowCalculation(i);
-        }
-        else
-            return false;
-    }
-    return true;
-}
-bool Gauss::gaussFull()
-{
-    for(int i=0; i<matrixSize-1; i++)
-    {
-        if(i<matrixSize-2)
-            maxElementInMatrix(i);
-        if(!diagonalCheckZero(i)) {
-            rowCalculation(i);
-        }
-        else
-            return false;
-    }
-    return true;
-}
+
+
