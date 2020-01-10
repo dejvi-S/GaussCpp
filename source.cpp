@@ -1,3 +1,6 @@
+/** Dawid Zając gr. 3.8/16
+*   Kod przyjmuje dane w postaci "test.csv"
+*/
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -32,8 +35,12 @@ public:
 
 int main()
 {
-    Gauss g1 = Gauss("test5.csv");
+    Gauss g1 = Gauss("test.csv");
     Gauss g2 = Gauss(g1),g3 = Gauss(g1),g4 = Gauss(g1);
+    cout<<"Macierz wczytana:\n";
+    g1.printMatrix();
+    cout<<"\n";
+
     g1.printSolve(Gauss::BASIC);
     g2.printSolve(Gauss::ROW);
     g3.printSolve(Gauss::COL);
@@ -227,30 +234,30 @@ bool Gauss::gauss(N e) {
     return true;
 }
 void Gauss::printSolve(N e) {
-    string temp = "";
-    switch(e)   {
-        case ROW:
-            temp = "Eliminacja Gaussa z wyborem elementu podstawowego w wierszu:\n";
-            break;
-        case COL:
-            temp = "Eliminacja Gaussa z wyborem elementu podstawowego w kolumnie:\n";
-            break;
-        case FULL:
-            temp = "Eliminacja Gaussa z pelnym wyborem elementu podstawowego:";
-            break;
-        default:
-            temp = "Podstawowa eliminacja Gaussa:";
-            break;
+    if(!this->matrixVectors.empty()) {
+        string temp = "";
+        switch(e)   {
+            case ROW:
+                temp = "Eliminacja Gaussa z wyborem elementu podstawowego w wierszu:\n";
+                break;
+            case COL:
+                temp = "Eliminacja Gaussa z wyborem elementu podstawowego w kolumnie:\n";
+                break;
+            case FULL:
+                temp = "Eliminacja Gaussa z pelnym wyborem elementu podstawowego:";
+                break;
+            default:
+                temp = "Podstawowa eliminacja Gaussa:";
+                break;
+        }
+        cout<<temp;
+        printResult(gauss(e));
+        cout<<"Macierz przeksztalcona:\n";
+        printMatrix();
+        for(int i=0;i<(matrixSize+1)*15;i++)
+            cout<<'-';
+        cout<<'\n';
     }
-    cout<<temp;
-    cout<<"\nMacierz wczytana:\n";
-    printMatrix();
-    printResult(gauss(e));
-    cout<<"Macierz przeksztalcona:\n";
-    printMatrix();
-    for(int i=0;i<(matrixSize+1)*15;i++)
-        cout<<'-';
-    cout<<'\n';
 }
 
 
