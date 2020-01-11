@@ -35,6 +35,7 @@ public:
 
 int main()
 {
+    cout<<"Wartosci bezwgledne < od "<<ESPe<<" sa to w przyblizeniu zera\n";
     Gauss g1 = Gauss("test.csv");
     Gauss g2 = Gauss(g1),g3 = Gauss(g1),g4 = Gauss(g1);
     cout<<"Macierz wczytana:\n";
@@ -120,8 +121,11 @@ double Gauss::matrixFactor(unsigned int index, unsigned int offsetIndex) {
 void Gauss::rowCalculation(unsigned int index) {
     for( int i=index; i<matrixSize-1 ;i++ ) {
             double tempFactor = matrixFactor(index,i-index);
-            for(int j=index+1; j<=matrixSize; j++)
+            for(int j=index+1; j<=matrixSize; j++) {
                 matrixVectors[i+1][j] = matrixVectors[i+1][j] - tempFactor * matrixVectors[index][j];
+                if(fabs(matrixVectors[i+1][j])<ESPe)
+                    matrixVectors[i+1][j]=0;
+            }
             for( int j=0; j<=index; j++)
                 matrixVectors[i+1][j] = 0;
     }
