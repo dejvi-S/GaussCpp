@@ -93,6 +93,7 @@ bool Gauss::fileRead(string fileName) {
     }
     sourceFile.close();
     result.assign(matrixSize,0);
+    delete charThrashCan;
     return true;
 }
 void Gauss::printMatrix() {
