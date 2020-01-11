@@ -21,7 +21,7 @@ public:
     Gauss(string fileName);
     Gauss(const Gauss &objectToClone);
     bool fileRead(string fileName);
-    bool printMatrix();
+    void printMatrix();
     bool diagonalCheckZero(unsigned int index);
     double matrixFactor(unsigned int index, unsigned int offsetIndex);
     void rowCalculation(unsigned int index);
@@ -94,18 +94,17 @@ bool Gauss::fileRead(string fileName) {
     result.assign(matrixSize,0);
     return true;
 }
-bool Gauss::printMatrix() {
-    if( this->matrixVectors.empty() ) {
+void Gauss::printMatrix() {
+    if( this->matrixVectors.empty() )
         cout << "Macierz jest pusta! Nie mam co wypisac!\n";
-        return false;
-    }
-    for(int i=0; i<matrixSize; i++) {
-        for(int j=0; j<matrixSize; j++) {
-            cout << left << setw(15) << setfill(' ') << matrixVectors[i][j];
+    else {
+        for(int i=0; i<matrixSize; i++) {
+            for(int j=0; j<matrixSize; j++) {
+                cout << left << setw(15) << setfill(' ') << matrixVectors[i][j];
+            }
+            cout << left << setw(7) << setfill(' ') <<"|"<< left << setw(7) << setfill(' ')<<matrixVectors[i][matrixSize]<<"\n";
         }
-        cout << left << setw(7) << setfill(' ') <<"|"<< left << setw(7) << setfill(' ')<<matrixVectors[i][matrixSize]<<"\n";
     }
-    return true;
 }
 Gauss::Gauss(const Gauss &objectToClone) {
     this->matrixSize = objectToClone.matrixSize;
@@ -137,22 +136,18 @@ void Gauss::printResult(bool successSwitch){
             if(fabs(result[i])<ESPe)
                 result[i] = 0;
         }
-        if(result.empty())
-            cout<<"Zbior wynikow jest pusty!\n";
-        else {
-            while(!swapStack.empty()) {
-                swap(result[swapStack.back()],result[swapStack.back()-1]);
-                swapStack.pop_back(); swapStack.pop_back();
-            }
-            cout<<"\nWynik:\n";
-            for(int i=0; i<result.size(); i++) {
-                cout<<"X"<< left << setw(6) << setfill(' ')<<i<<result[i]<<"\n";
-            }   cout<<"\n";
+        cout<<swapStack.size()<<"TEST"<<endl;
+        while(!swapStack.empty()) {
+            swap(result[swapStack.back()],result[swapStack.back()-1]);
+            swapStack.pop_back(); swapStack.pop_back();
         }
+        cout<<"\nWynik:\n";
+        for(int i=0; i<result.size(); i++) {
+            cout<<"X"<< left << setw(6) << setfill(' ')<<i<<result[i]<<"\n";
+        }   cout<<"\n";
     } else cout<<"Macierz osobliwa!\n";
 }
-void Gauss::maxElementInRow(unsigned int index)
-{
+void Gauss::maxElementInRow(unsigned int index) {
     double tempMaxElement = fabs(matrixVectors[index][index]);
     unsigned int swapIndex = index;
     for(int i=index+1;i<matrixSize;i++)
@@ -160,15 +155,14 @@ void Gauss::maxElementInRow(unsigned int index)
             tempMaxElement = fabs(matrixVectors[index][i]);
             swapIndex = i;
         }
-    if(index != swapIndex) {
+    if(fabs(matrixVectors[index][index]) != fabs(matrixVectors[index][swapIndex])) {
         swapStack.push_back(index);
         swapStack.push_back(swapIndex);
         for(int i=0; i<matrixSize; i++)
             swap(matrixVectors[i][swapIndex],matrixVectors[i][index]);
     }
 }
-void Gauss::maxElementInColumn(unsigned int index)
-{
+void Gauss::maxElementInColumn(unsigned int index) {
     double tempMaxElement = fabs(matrixVectors[index][index]);
     unsigned int swapIndex = index;
     for(int i=index+1;i<matrixSize;i++)
@@ -176,12 +170,11 @@ void Gauss::maxElementInColumn(unsigned int index)
             tempMaxElement = fabs(matrixVectors[i][index]);
             swapIndex = i;
         }
-    if(index != swapIndex)
+    if(fabs(matrixVectors[index][index]) != fabs(matrixVectors[swapIndex][index]))
         for(int i=index; i<=matrixSize; i++)
             swap(matrixVectors[swapIndex][i],matrixVectors[index][i]);
 }
-void Gauss::maxElementInMatrix(unsigned int index)
-{
+void Gauss::maxElementInMatrix(unsigned int index) {
     double tempMaxElement = fabs(matrixVectors[index][index]);
     unsigned int swapIndexJ = index;
     unsigned int swapIndexI = index;
@@ -203,7 +196,7 @@ void Gauss::maxElementInMatrix(unsigned int index)
     }
 }
 bool Gauss::gauss(N e) {
-    typedef void( Gauss::*functor)(unsigned int);
+    typedef void(Gauss::*functor)(unsigned int);
     functor sortFunction;
     switch(e)   {
         case ROW:
