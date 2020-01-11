@@ -136,10 +136,13 @@ void Gauss::printResult(bool successSwitch){
             if(fabs(result[i])<ESPe)
                 result[i] = 0;
         }
-        cout<<swapStack.size()<<"TEST"<<endl;
         while(!swapStack.empty()) {
-            swap(result[swapStack.back()],result[swapStack.back()-1]);
-            swapStack.pop_back(); swapStack.pop_back();
+            unsigned int x,y;
+            x=swapStack.back();
+            swapStack.pop_back();
+            y=swapStack.back();
+            swapStack.pop_back();
+            swap(result[x],result[y]);
         }
         cout<<"\nWynik:\n";
         for(int i=0; i<result.size(); i++) {
@@ -185,10 +188,10 @@ void Gauss::maxElementInMatrix(unsigned int index) {
                 swapIndexJ = j;
                 swapIndexI = i;
             }
-    if(index != swapIndexI)
+    if(index != swapIndexI || fabs(matrixVectors[index][index]) != fabs(matrixVectors[swapIndexI][swapIndexJ]))
         for(int i=index; i<=matrixSize; i++)
             swap(matrixVectors[swapIndexI][i],matrixVectors[index][i]);
-    if(index != swapIndexJ) {
+    if(index != swapIndexJ || fabs(matrixVectors[index][index]) != fabs(matrixVectors[swapIndexI][swapIndexJ])) {
         swapStack.push_back(index);
         swapStack.push_back(swapIndexJ);
         for(int i=0; i<matrixSize; i++)
@@ -237,10 +240,10 @@ void Gauss::printSolve(N e) {
                 temp = "Eliminacja Gaussa z wyborem elementu podstawowego w kolumnie:\n";
                 break;
             case FULL:
-                temp = "Eliminacja Gaussa z pelnym wyborem elementu podstawowego:";
+                temp = "Eliminacja Gaussa z pelnym wyborem elementu podstawowego:\n";
                 break;
             default:
-                temp = "Podstawowa eliminacja Gaussa:";
+                temp = "Podstawowa eliminacja Gaussa:\n";
                 break;
         }
         cout<<temp;
